@@ -1,49 +1,45 @@
-Project Title: Multi-label Attribute Recognition System
+# Multi-label Attribute Classification Project
 
-Framework: PyTorch / Torchvision
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/get-started/locally/)
 
-Architecture: ResNet50 (Transfer Learning)
+## 📌 Project Overview
+This repository contains a deep learning solution for a **multi-label classification** task. The objective is to identify four distinct attributes within a dataset of images while addressing real-world data challenges such as **missing labels (NA values)** and **skewed class distributions**.
 
-Key Features:
+### Key Deliverables:
+1. **Model Weights:** `deep-model.pth`
+2. **Loss Visualization:** `loss_curve.png`
+3. **Inference Script:** `inference.py`
+4. **Training Logic:** Handled within the provided notebook/script.
 
-NA Label Masking: A custom loss implementation that ignores attributes marked as "NA" in labels.txt, allowing the model to utilize partially labeled data without introducing bias.
+---
 
-Imbalance Handling: Computed positional weights for each attribute to counteract data skewness, improving recall on minority attributes.
+## 🛠️ Technical Implementation
 
-Production-Ready Inference: Includes a standalone inference.py script with a Predictor class for easy integration and deployment.
+### 1. Handling Missing Labels (NA)
+A common challenge in this dataset was the presence of "NA" tags. To avoid losing valuable data, I implemented a **Masked Binary Cross-Entropy Loss**.
+* **Mechanism:** Labels are mapped as `1` (Present), `0` (Absent), and `-1` (NA). 
+* **Logic:** The custom loss function generates a binary mask where $Targets \geq 0$. During backpropagation, gradients from "NA" attributes are zeroed out, ensuring the model only learns from verified annotations.
 
-Performance Tracking: Automated generation of training loss curves for convergence verification.
+### 2. Imbalance Mitigation
+To prevent the model from biasing toward the majority class, I calculated **Positional Weights** for the `BCEWithLogitsLoss`.
+* **Formula:** $\text{weight} = \frac{\text{negative\_samples}}{\text{positive\_samples}}$
+* **Impact:** This increases the penalty for misclassifying minority attributes, improving the overall F1-score and recall across all four categories.
 
-3. Step-by-Step Repository Creation Guide
-To ensure you meet the February 23rd (Today) deadline properly:
+### 3. Architecture
+- **Backbone:** ResNet50 (Pre-trained on ImageNet-1K).
+- **Modification:** The final fully connected layer was replaced with a 4-unit linear layer to match the attribute count.
+- **Optimization:** Adam Optimizer with a learning rate of $1 \times 10^{-4}$.
 
-Initialize: On GitHub, click New Repository.
 
-Naming: Use a professional name like Aimonk-Attribute-Classification.
 
-Visibility: Select Public (as per your instruction).
+---
 
-Add a README: Check the box that says "Add a README file."
-
-Add a .gitignore: Select the Python template (this prevents temporary files from cluttering your repo).
-
-Upload: Use the "Add file" -> "Upload files" button to add:
-
-training_script.ipynb or .py
-
-inference.py
-
-loss_curve.png
-
-deep-model.pth (Only if it's under 25MB; otherwise, use the Google Drive link method discussed earlier).
-
-4. Important: Verify Public Access
-Once you create the link, test it to make sure it is truly "Public":
-
-Copy your GitHub URL.
-
-Open an Incognito/Private window in your browser.
-
-Paste the link.
-
-If you can see your code without logging in, you have successfully met the "Make it Public" requirement.
+## 📂 Repository Structure
+```text
+├── images/               # Directory containing the dataset
+├── labels.txt            # Original annotation file
+├── deep-model.pth        # Trained weights (Deliverable)
+├── loss_curve.png        # Training loss visualization (Deliverable)
+├── inference.py          # Modular script for testing new images
+└── README.md             # Project documentation
